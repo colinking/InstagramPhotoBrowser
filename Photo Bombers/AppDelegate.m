@@ -7,13 +7,49 @@
 //
 
 #import "AppDelegate.h"
+#import "PhotosViewController.h"
+#import <SimpleAuth/SimpleAuth.h>
+#import "SWRevealViewController.h"
+#import "SideBarTableViewController.h"
+
+@interface AppDelegate()<SWRevealViewControllerDelegate>
+@end
 
 @implementation AppDelegate
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
+    
+//    [NSThread sleepForTimeInterval:1.5];
+    
+    SimpleAuth.configuration[@"instagram"] = @{
+       @"client_id": @"6c38de5d4a744217b0eacaa982026bd3",
+       SimpleAuthRedirectURIKey: @"photobombers://auth/instagram"
+    };
+    
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
-    // Override point for customization after application launch.
+    
+    //The main content, in this case the photo viewer
+    PhotosViewController *photosViewController = [[PhotosViewController alloc] init];
+    
+    //The side bar
+	SideBarTableViewController *sideBarTableViewController = [[SideBarTableViewController alloc] init];
+    sideBarTableViewController.photosViewController = photosViewController;
+    photosViewController.sideBarTableViewController = sideBarTableViewController;
+    UINavigationController *rearNavigationController = [[UINavigationController alloc] initWithRootViewController:sideBarTableViewController];
+	UINavigationController *frontNavigationController = [[UINavigationController alloc] initWithRootViewController:photosViewController];
+	[frontNavigationController.navigationBar setTitleTextAttributes:[NSDictionary dictionaryWithObjectsAndKeys:[UIFont fontWithName:@"Futura" size:18], NSFontAttributeName, nil]];
+	SWRevealViewController *revealController = [[SWRevealViewController alloc] initWithRearViewController:rearNavigationController frontViewController:frontNavigationController];
+    revealController.delegate = self;
+    
+    self.revealController = revealController;
+    
+    //Style the nav bar
+    UINavigationBar *navBar = frontNavigationController.navigationBar;
+    navBar.barTintColor = [UIColor colorWithRed:242.0/255.0 green:122.0/255.0 blue:87.0/255.0 alpha:1.0];
+    navBar.barStyle = UIBarStyleBlackOpaque;
+    
+    self.window.rootViewController = revealController;
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     return YES;
@@ -44,6 +80,13 @@
 - (void)applicationWillTerminate:(UIApplication *)application
 {
     // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+}
+
+#pragma mark - Reveal Controller Methods
+
+- (BOOL)revealControllerPanGestureShouldBegin:(SWRevealViewController *)revealController {
+//    NSLog(@"%f", [[revealController panGestureRecognizer] locationInView:self.window.rootViewController.view].x);
+    return NO;
 }
 
 @end

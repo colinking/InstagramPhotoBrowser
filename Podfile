@@ -1,0 +1,5 @@
+pod 'SimpleAuth/Instagram'
+pod 'SAMCache'
+pod 'SSKeychain'
+pod 'SAMCategories'
+pod 'FontAwesomeKit', '~>2.1.0'
